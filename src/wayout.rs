@@ -35,42 +35,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
     let output_power_manager = globals.instantiate_exact::<ZwlrOutputPowerManagerV1>(1);
     let head_states: Rc<RefCell<Vec<HeadState>>> = Rc::new(RefCell::new(Vec::new()));
 
-    let output_choice: WlOutput;
-    if args.is_present("output") || args.is_present("toggle") {
-        if !args.is_present("state") && !args.is_present("toggle") {
-            println!("Error: No output state provided, use --state flag and set it to \"on\" or \"off\". You can also use --toggle flag to toggle the current state.");
-            exit(1);
-        }
-        let output_name = args.value_of("output").unwrap().trim();
-        output_choice =
-            get_wloutput(output_name.to_string(), valid_outputs.clone(), args.clone()).clone();
-        if args.is_present("state") {
-            let state = match args
-                .value_of("state")
-                .unwrap()
-                .trim()
-                .to_lowercase()
-                .as_str()
-            {
-                "on" => Mode::On,
-                "off" => Mode::Off,
-                _ => {
-                    println!("Error: Invalid state provided. Valid inputs: \"on\" \"off\"");
-                    exit(1);
-                }
-            };
-            output_power_manager
-                .as_ref()
-                .unwrap()
-                .get_output_power(&output_choice.clone())
-                .set_mode(state);
-        }
-    }
-
-    for output in valid_outputs {
-        if args.is_present("output") {
-            break;
-        }
+    for output in valid_outputs.clone() {
         let (output, output_info) = output;
         let output_name = output_info.name;
         output_power_manager
@@ -107,11 +72,63 @@ pub fn main() -> Result<(), Box<dyn Error>> {
             });
     }
     event_queue.sync_roundtrip(&mut (), |_, _, _| {})?;
-    //if args.is_present("toggle") {
-    //for head in head_states.borrow_mut() {
-    //if head.name ==
-    //}
-    //}
+
+    if args.is_present("output") {
+        if !args.is_present("state") && !args.is_present("toggle") {
+            println!("Error: No output state provided, use --state flag and set it to \"on\" or \"off\". You can also use --toggle flag to toggle the current state.");
+            exit(1);
+        }
+        let output_name = args.value_of("output").unwrap().trim();
+        let output_choice =
+            get_wloutput(output_name.to_string(), valid_outputs.clone(), args.clone()).clone();
+        if args.is_present("state") {
+            let state = match args
+                .value_of("state")
+                .unwrap()
+                .trim()
+                .to_lowercase()
+                .as_str()
+            {
+                "on" => Mode::On,
+                "off" => Mode::Off,
+                _ => {
+                    println!("Error: Invalid state provided. Valid inputs: \"on\" \"off\"");
+                    exit(1);
+                }
+            };
+            output_power_manager
+                .as_ref()
+                .unwrap()
+                .get_output_power(&output_choice.clone())
+                .set_mode(state);
+        }
+        if args.is_present("toggle") {
+            for head in head_states.borrow_mut().to_vec() {
+                if head.name == args.value_of("output").unwrap().trim() {
+                    match head.mode {
+                        Mode::On => {
+                            output_power_manager
+                                .as_ref()
+                                .unwrap()
+                                .get_output_power(&output_choice.clone())
+                                .set_mode(Mode::Off);
+                        }
+                        Mode::Off => {
+                            output_power_manager
+                                .as_ref()
+                                .unwrap()
+                                .get_output_power(&output_choice.clone())
+                                .set_mode(Mode::On);
+                        }
+                        _ => unreachable!(),
+                    };
+                    break;
+                }
+            }
+        }
+    }
+
+    event_queue.sync_roundtrip(&mut (), |_, _, _| {})?;
     Ok(())
 }
 
