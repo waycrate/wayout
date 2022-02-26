@@ -16,6 +16,13 @@ pub fn set_flags() -> Command<'static> {
                 .required(false)
                 .takes_value(true)
                 .help("Set output state to on or off."),
+        )
+        .arg(
+            arg!(-t - -toggle)
+                .required(false)
+                .takes_value(false)
+                .conflicts_with("state")
+                .help("Toggle output state."),
         );
     app
 }
