@@ -13,7 +13,7 @@
 
 # Usage:
 ```bash
-wayout -o <your output name> -s <on/off/toggle>
+wayout -o <your output name> -s <on/off>
 ```
 # Installation
 
