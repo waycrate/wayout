@@ -18,7 +18,7 @@ wayout -o <your output name> -s <on/off/toggle>
 # Installation
 
 ## AUR:
-`wayout-git` will be packaged soon.
+`wayout-git` has been packaged.
 
 ## Compile time dependencies:
 -   rustup
