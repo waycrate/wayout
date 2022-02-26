@@ -6,23 +6,28 @@ pub fn set_flags() -> Command<'static> {
         .author(env!("CARGO_PKG_AUTHORS"))
         .about("Simple tool to set output mode of Heads for wlroots based compositors.")
         .arg(
-            arg!(-o --output <OUTPUT>)
+            arg!(--off <OUTPUT>)
                 .required(false)
                 .takes_value(true)
-                .help("Choose a particular display to screenshot."),
+                .conflicts_with("on")
+                .conflicts_with("toggle")
+                .help("Turn off the display."),
         )
         .arg(
-            arg!(-s --state <STATE>)
+            arg!(--on <OUTPUT>)
                 .required(false)
                 .takes_value(true)
-                .help("Set output state to on or off."),
+                .conflicts_with("off")
+                .conflicts_with("toggle")
+                .help("Turn on the display."),
         )
         .arg(
-            arg!(-t - -toggle)
+            arg!(--toggle <OUTPUT>)
                 .required(false)
-                .takes_value(false)
-                .conflicts_with("state")
-                .help("Toggle output state."),
+                .takes_value(true)
+                .conflicts_with("on")
+                .conflicts_with("off")
+                .help("Toggle the output state of the display."),
         );
     app
 }
