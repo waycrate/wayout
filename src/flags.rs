@@ -11,7 +11,7 @@ pub fn set_flags() -> Command<'static> {
                 .takes_value(true)
                 .conflicts_with("on")
                 .conflicts_with("toggle")
-                .help("Turn off the display."),
+                .help("Turn off the display"),
         )
         .arg(
             arg!(--on <OUTPUT>)
@@ -19,7 +19,7 @@ pub fn set_flags() -> Command<'static> {
                 .takes_value(true)
                 .conflicts_with("off")
                 .conflicts_with("toggle")
-                .help("Turn on the display."),
+                .help("Turn on the display"),
         )
         .arg(
             arg!(--toggle <OUTPUT>)
@@ -27,7 +27,7 @@ pub fn set_flags() -> Command<'static> {
                 .takes_value(true)
                 .conflicts_with("on")
                 .conflicts_with("off")
-                .help("Toggle the output state of the display."),
+                .help("Toggle the output state of the display"),
         );
     app
 }
