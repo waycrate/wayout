@@ -1,7 +1,19 @@
 [package]
-authors = ["Shinyzenith <aakashsensharma@gmail.com>"]
+authors = ["Shinyzenith <https://shinyzenith.xyz>"]
+description = "A Simple tool to set output modes for wlroots compositors implementing zwlr_output_power_management_v1."
+documentation = "https://docs.rs/crate/wayout/latest"
 edition = "2021"
+exclude = [
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+	"contrib/*",
+	"docs/*",
+]
+homepage = "https://waycrate.shinyzenith.xyz"
+keywords = ["display", "power", "wlroots"]
+license = "BSD-2-Clause"
 name = "wayout"
+repository = "https://git.sr.ht/~shinyzenith/wayout"
 version = "1.0.0"
 
 [dependencies]
