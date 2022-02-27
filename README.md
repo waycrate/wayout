@@ -12,8 +12,24 @@
 </p>
 
 # Usage:
+List output states:
 ```bash
-wayout -o <your output name> -s <on/off>
+wayout
+```
+
+Turn on a display:
+```bash
+wayout --on <your output name>
+```
+
+Turn off a display:
+```bash
+wayout --off <your output name>
+```
+
+Toggle the state of a display:
+```bash
+wayout --toggle <your output name>
 ```
 # Installation
 
