@@ -30,11 +30,11 @@ pub fn main() {
     }
 
     if args.is_present("on") {
-        set_head_state(output_name.clone(), Mode::On);
+        set_head_state(output_name, Mode::On);
         exit(1);
     }
     if args.is_present("off") {
-        set_head_state(output_name.clone(), Mode::Off);
+        set_head_state(output_name, Mode::Off);
         exit(1);
     }
     if args.is_present("toggle") {
@@ -43,10 +43,10 @@ pub fn main() {
             if head.name == output_name.clone() {
                 match head.mode {
                     Mode::On => {
-                        set_head_state(output_name.clone(), Mode::Off);
+                        set_head_state(output_name, Mode::Off);
                     }
                     Mode::Off => {
-                        set_head_state(output_name.clone(), Mode::On);
+                        set_head_state(output_name, Mode::On);
                     }
                     _ => unreachable!(),
                 }
@@ -72,11 +72,11 @@ pub fn set_head_state(output_name: String, mode: Mode) {
     let output_power_manager = globals.instantiate_exact::<ZwlrOutputPowerManagerV1>(1);
     event_queue.sync_roundtrip(&mut (), |_, _, _| {}).unwrap();
 
-    let output_choice = get_wloutput(output_name.to_string(), valid_outputs.clone());
+    let output_choice = get_wloutput(output_name, valid_outputs);
     output_power_manager
         .as_ref()
         .unwrap()
-        .get_output_power(&output_choice.clone())
+        .get_output_power(&output_choice)
         .set_mode(mode);
     event_queue.sync_roundtrip(&mut (), |_, _, _| {}).unwrap();
 }
@@ -92,7 +92,7 @@ pub fn get_head_states() -> Vec<HeadState> {
     let output_power_manager = globals.instantiate_exact::<ZwlrOutputPowerManagerV1>(1);
     let head_states: Rc<RefCell<Vec<HeadState>>> = Rc::new(RefCell::new(Vec::new()));
 
-    for output in valid_outputs.clone() {
+    for output in valid_outputs {
         let (output, output_info) = output;
         let output_name = output_info.name;
         output_power_manager
@@ -107,13 +107,13 @@ pub fn get_head_states() -> Vec<HeadState> {
                         Mode::On => {
                             head_states.borrow_mut().push(HeadState {
                                 name: output_name.clone(),
-                                mode: mode,
+                                mode,
                             });
                         }
                         Mode::Off => {
                             head_states.borrow_mut().push(HeadState {
                                 name: output_name.clone(),
-                                mode: mode,
+                                mode,
                             });
                         }
                         _ => unreachable!(),
@@ -132,7 +132,7 @@ pub fn get_head_states() -> Vec<HeadState> {
 }
 
 fn get_wloutput(name: String, valid_outputs: Vec<(WlOutput, OutputInfo)>) -> WlOutput {
-    for device in valid_outputs.clone() {
+    for device in valid_outputs {
         let (output_device, info) = device;
         if info.name == name {
             return output_device;
