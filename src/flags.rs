@@ -21,7 +21,6 @@ pub fn set_flags() -> Command<'static> {
             arg!(--toggle <OUTPUT>)
                 .required(false)
                 .takes_value(true)
-                .conflicts_with("state")
                 .help("Toggle output state."),
         );
     app

@@ -18,8 +18,13 @@ version = "1.0.0"
 
 [dependencies]
 clap = "3.1.2"
-smithay-client-toolkit = "0.15.3"
+wayland-client = "0.29.4"
+wayland-protocols = { version = "0.29.4", features=["unstable_protocols", "client"] }
 
 [[bin]]
 name = "wayout"
 path = "src/wayout.rs"
+
+[profile.release]
+opt-level = 'z'     # Optimize for size.
+strip = true        # Strip symbols from bina

@@ -1,12 +1,7 @@
-use smithay_client_toolkit::{
-    output::OutputInfo,
-    reexports::{
-        client::{protocol::wl_output::WlOutput, Display, GlobalManager},
-        protocols::wlr::unstable::output_power_management::v1::client::{
-            zwlr_output_power_manager_v1::ZwlrOutputPowerManagerV1, zwlr_output_power_v1,
-            zwlr_output_power_v1::Mode,
-        },
-    },
+use wayland_client::{protocol::wl_output::WlOutput, Display, GlobalManager};
+use wayland_protocols::wlr::unstable::output_power_management::v1::client::{
+    zwlr_output_power_manager_v1::ZwlrOutputPowerManagerV1, zwlr_output_power_v1,
+    zwlr_output_power_v1::Mode,
 };
 
 use std::{cell::RefCell, process::exit, rc::Rc};
@@ -68,11 +63,11 @@ pub fn set_head_state(output_name: String, mode: Mode) {
     let globals = GlobalManager::new(&attached_display);
     event_queue.sync_roundtrip(&mut (), |_, _, _| {}).unwrap();
 
-    let valid_outputs = output::get_valid_outputs(display);
+    let valid_outputs = output::get_all_outputs(display);
     let output_power_manager = globals.instantiate_exact::<ZwlrOutputPowerManagerV1>(1);
     event_queue.sync_roundtrip(&mut (), |_, _, _| {}).unwrap();
 
-    let output_choice = get_wloutput(output_name, valid_outputs);
+    let output_choice = output::get_wloutput(output_name, valid_outputs);
     output_power_manager
         .as_ref()
         .unwrap()
@@ -88,17 +83,20 @@ pub fn get_head_states() -> Vec<HeadState> {
     event_queue
         .dispatch(&mut (), |_, _, _| unreachable!())
         .unwrap();
-    let valid_outputs = output::get_valid_outputs(display);
+    let valid_outputs = output::get_all_outputs(display);
     let output_power_manager = globals.instantiate_exact::<ZwlrOutputPowerManagerV1>(1);
     let head_states: Rc<RefCell<Vec<HeadState>>> = Rc::new(RefCell::new(Vec::new()));
 
     for output in valid_outputs {
-        let (output, output_info) = output;
-        let output_name = output_info.name;
+        let output_name = output.name;
+        let output_ptr: &WlOutput;
+        unsafe {
+            output_ptr = &*output.wl_output as &WlOutput;
+        }
         output_power_manager
             .as_ref()
             .unwrap()
-            .get_output_power(&output)
+            .get_output_power(output_ptr)
             .quick_assign({
                 let head_states = head_states.clone();
                 let output_name = output_name.clone();
@@ -129,15 +127,4 @@ pub fn get_head_states() -> Vec<HeadState> {
     event_queue.sync_roundtrip(&mut (), |_, _, _| {}).unwrap();
     let head_states = head_states.borrow_mut().to_vec();
     head_states
-}
-
-fn get_wloutput(name: String, valid_outputs: Vec<(WlOutput, OutputInfo)>) -> WlOutput {
-    for device in valid_outputs {
-        let (output_device, info) = device;
-        if info.name == name {
-            return output_device;
-        }
-    }
-    println!("Error: No output of name \"{}\" was found", name);
-    exit(1);
 }
