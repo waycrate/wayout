@@ -1,4 +1,4 @@
-use wayland_client::{protocol::wl_output::WlOutput, Display, GlobalManager};
+use wayland_client::{Display, GlobalManager};
 use wayland_protocols::wlr::unstable::output_power_management::v1::client::{
     zwlr_output_power_manager_v1::ZwlrOutputPowerManagerV1, zwlr_output_power_v1,
     zwlr_output_power_v1::Mode,
@@ -89,10 +89,7 @@ pub fn get_head_states() -> Vec<HeadState> {
 
     for output in valid_outputs {
         let output_name = output.name;
-        let output_ptr: &WlOutput;
-        unsafe {
-            output_ptr = &*output.wl_output as &WlOutput;
-        }
+        let output_ptr = &output.wl_output;
         output_power_manager
             .as_ref()
             .unwrap()
