@@ -39,7 +39,6 @@ pub fn get_all_outputs(display: Display) -> Vec<OutputInfo> {
         println!("Compositor did not advertise any wl_output devices!");
         exit(1);
     }
-    println!("Outputs detected: {:#?}", outputs);
     outputs.take()
 }
 
