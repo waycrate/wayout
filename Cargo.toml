@@ -14,7 +14,7 @@ keywords = ["display", "power", "wlroots"]
 license = "BSD-2-Clause"
 name = "wayout"
 repository = "https://git.sr.ht/~shinyzenith/wayout"
-version = "1.1.2"
+version = "1.1.3"
 
 [dependencies]
 clap = "3.1.2"
@@ -26,5 +26,5 @@ name = "wayout"
 path = "src/wayout.rs"
 
 [profile.release]
-opt-level = 'z'     # Optimize for size.
-strip = true        # Strip symbols from bina
+opt-level = 'z'
+strip = true
