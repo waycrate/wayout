@@ -1,5 +1,5 @@
 use std::{cell::RefCell, process::exit, rc::Rc};
-use wayland_client::{protocol::wl_output, protocol::wl_output::WlOutput, Display, GlobalManager};
+use wayland_client::{protocol::wl_output, protocol::wl_output::WlOutput};
 
 #[derive(Debug, Clone)]
 pub struct OutputInfo {
@@ -8,7 +8,7 @@ pub struct OutputInfo {
 }
 
 pub fn get_all_outputs(display: Display) -> Vec<OutputInfo> {
-    // Connecting to wayland environment.
+    /* // Connecting to wayland environment.
     let mut event_queue = display.create_event_queue();
     let attached_display = (*display).clone().attach(event_queue.token());
 
@@ -39,7 +39,8 @@ pub fn get_all_outputs(display: Display) -> Vec<OutputInfo> {
         println!("Compositor did not advertise any wl_output devices!");
         exit(1);
     }
-    outputs.take()
+    outputs.take() */
+    return vec![];
 }
 
 /// Get a wl_output object from the output name.

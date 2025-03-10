@@ -1,27 +1,23 @@
-use clap::{arg, Command};
+use clap::Parser;
 
-pub fn set_flags() -> Command<'static> {
-    let app = Command::new("wayout")
-        .version(env!("CARGO_PKG_VERSION"))
-        .author(env!("CARGO_PKG_AUTHORS"))
-        .about("Simple tool to set output mode of Heads for wlroots based compositors.")
-        .arg(
-            arg!(--on <OUTPUT>)
-                .required(false)
-                .takes_value(true)
-                .help("Set output state to on."),
-        )
-        .arg(
-            arg!(--off <OUTPUT>)
-                .required(false)
-                .takes_value(true)
-                .help("Set output state to off."),
-        )
-        .arg(
-            arg!(--toggle <OUTPUT>)
-                .required(false)
-                .takes_value(true)
-                .help("Toggle output state."),
-        );
-    app
+#[derive(Parser)]
+#[command(
+    name = "wayout",
+    version = env!("CARGO_PKG_VERSION"),
+    author = env!("CARGO_PKG_AUTHORS"),
+    about = "Simple tool to set output mode of Heads for wlroots based compositors."
+)]
+pub struct CLI {
+    #[arg(long, value_name = "OUTPUT")]
+    pub on: Option<String>,
+
+    #[arg(long, value_name = "OUTPUT")]
+    pub off: Option<String>,
+
+    #[arg(long, value_name = "OUTPUT")]
+    pub toggle: Option<String>,
+}
+
+pub fn parse_flags() -> CLI {
+    return CLI::parse();
 }
