@@ -1,35 +1,29 @@
-use wayland_client::{protocol::wl_registry, Connection, Dispatch, QueueHandle};
 use wayland_protocols_wlr::output_power_management::v1::client::{
-    zwlr_output_power_manager_v1::ZwlrOutputPowerManagerV1, zwlr_output_power_v1, zwlr_output_power_v1::Mode,
+    //zwlr_output_power_manager_v1::ZwlrOutputPowerManagerV1, zwlr_output_power_v1,
+    zwlr_output_power_v1::Mode,
 };
-use std::{cell::RefCell, process::exit, rc::Rc};
-
 mod flags;
 mod output;
+mod wayland;
+use wayland::WayoutConnection;
 
 #[derive(Debug, Clone)]
 pub struct HeadState {
     name: String,
     mode: Mode,
 }
-
-struct Wayout {
-    age: i32,
-}
-
-impl Dispatch<wl_registry::WlRegistry, ()> for Wayout {
-    fn event(
-        _state: &mut Self,
-        _: &wl_registry::WlRegistry,
-        event: wl_registry::Event,
-        _: &(),
-        _: &Connection,
-        _:&QueueHandle<Wayout>,
-        ) {
-    }
-}
-
 pub fn main() {
+    let mut wayout_conn = WayoutConnection::init();
+    wayout_conn.refresh_outputs();
+
+    let output = wayout_conn.get_wloutput("WL-1".to_string()).unwrap();
+    wayout_conn.set_head_state(output, Mode::On);
+
+    for i in wayout_conn.wl_outputs {
+        println!("{}", i);
+    }
+    return;
+
     let args = flags::parse_flags();
     let mut output_name = String::new();
 
