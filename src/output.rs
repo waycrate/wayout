@@ -95,6 +95,7 @@ pub fn get_all_wl_outputs(wl_connection: &Connection) -> Vec<OutputInfo> {
     let qh = event_queue.handle();
 
     let _ = wl_connection.display().get_registry(&qh, ());
+
     event_queue.roundtrip(&mut state).unwrap(); // This one gets all wl_outputs
     event_queue.roundtrip(&mut state).unwrap(); // This one gets all the events of ALL the
                                                 // wl_outputs

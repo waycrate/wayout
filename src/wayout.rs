@@ -17,10 +17,15 @@ pub fn main() {
     wayout_conn.refresh_outputs();
 
     let output = wayout_conn.get_wloutput("WL-1".to_string()).unwrap();
-    wayout_conn.set_head_state(output, Mode::On);
+    wayout_conn.set_output_state(output, Mode::On);
 
-    for i in wayout_conn.wl_outputs {
+    for i in wayout_conn.wl_outputs.clone().into_iter() {
         println!("{}", i);
+    }
+
+    let v = wayout_conn.get_output_state();
+    for head in v {
+        println!("{} {:?}", head.name, head.mode);
     }
     return;
 

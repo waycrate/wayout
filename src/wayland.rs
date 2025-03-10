@@ -9,8 +9,8 @@ use wayland_client::{
     Connection, Dispatch, QueueHandle,
 };
 use wayland_protocols_wlr::output_power_management::v1::client::{
-    zwlr_output_power_manager_v1::ZwlrOutputPowerManagerV1,
-    zwlr_output_power_v1::{Mode, ZwlrOutputPowerV1},
+    zwlr_output_power_manager_v1::{self, ZwlrOutputPowerManagerV1},
+    zwlr_output_power_v1::{self, Mode, ZwlrOutputPowerV1},
 };
 
 #[derive(Debug)]
@@ -18,7 +18,6 @@ pub struct WayoutConnection {
     pub wl_connection: Connection,
     pub wl_globals: GlobalList,
     pub wl_outputs: Vec<OutputInfo>,
-    pub zwlr_output_power_manager: Option<ZwlrOutputPowerManagerV1>,
 }
 
 impl Dispatch<wl_registry::WlRegistry, GlobalListContents> for WayoutConnection {
@@ -51,19 +50,7 @@ impl WayoutConnection {
             wl_connection,
             wl_globals,
             wl_outputs: vec![],
-            zwlr_output_power_manager: None,
         };
-
-        let zxdg_output_power_manager =
-            match wl_globals.bind::<ZwlrOutputPowerManagerV1, _, _>(&qh, 1..=1, ()) {
-                Ok(x) => Some(x),
-                Err(e) => {
-                    print!("Failed to bind to required wayaland global: {}", e);
-                    None
-                }
-            };
-
-        let _ = wl_connection.display().get_registry(&queue_handle, ());
 
         return wayout_state;
     }
@@ -82,18 +69,17 @@ impl WayoutConnection {
         None
     }
 
-    pub fn set_head_state(self: &Self, output: WlOutput, mode: Mode) {
+    pub fn set_output_state(self: &Self, output: WlOutput, mode: Mode) {
         let mut event_queue = self.wl_connection.new_event_queue::<PowerManagerState>();
         let qh = event_queue.handle();
 
-        let zxdg_output_power_manager = match self
+        let zwlr_output_power_manager = match self
             .wl_globals
             .bind::<ZwlrOutputPowerManagerV1, _, _>(&qh, 1..=1, ())
         {
             Ok(x) => x,
             Err(e) => {
-                println!("Failed to bind to required wayaland global: {}", e);
-                return;
+                panic!("Failed to bind to required wayaland global: {}", e);
             }
         };
 
@@ -101,14 +87,84 @@ impl WayoutConnection {
         let _ = self.wl_connection.display().get_registry(&qh, ());
         event_queue.roundtrip(&mut state).unwrap();
 
-        zxdg_output_power_manager
+        zwlr_output_power_manager
             .get_output_power(&output, &qh, ())
             .set_mode(mode);
         event_queue.roundtrip(&mut state).unwrap();
     }
+
+    pub fn get_output_state(self: &Self) -> Vec<OutputState> {
+        let mut event_queue = self.wl_connection.new_event_queue::<OutputState>();
+        let qh = event_queue.handle();
+
+        let zwlr_output_power_manager = match self
+            .wl_globals
+            .bind::<ZwlrOutputPowerManagerV1, _, _>(&qh, 1..=1, ())
+        {
+            Ok(x) => x,
+            Err(e) => {
+                panic!("Failed to bind to required wayland global: {}", e);
+            }
+        };
+        let mut states: Vec<OutputState> = vec![];
+
+        for output in self.wl_outputs.clone() {
+            let mut state = OutputState {
+                name: output.name,
+                mode: Mode::Off,
+            };
+            zwlr_output_power_manager.get_output_power(&output.wl_output, &qh, ());
+
+            states.push(state.clone());
+            event_queue.blocking_dispatch(&mut state).unwrap();
+        }
+
+        //event_queue.roundtrip(&mut state).unwrap();
+        return states;
+    }
 }
 
 pub struct PowerManagerState;
+#[derive(Clone, Eq, PartialEq, Hash)]
+pub struct OutputState {
+    pub name: String,
+    pub mode: Mode,
+}
+
+impl Dispatch<ZwlrOutputPowerV1, ()> for OutputState {
+    fn event(
+        app_state: &mut Self,
+        _: &ZwlrOutputPowerV1,
+        event: zwlr_output_power_v1::Event,
+        _: &(),
+        _: &Connection,
+        _: &QueueHandle<OutputState>,
+    ) {
+        app_state.mode = match event {
+            zwlr_output_power_v1::Event::Mode { mode } => mode.into_result().unwrap(),
+            zwlr_output_power_v1::Event::Failed { .. } => {
+                println!("Failed to get output power mode!");
+                Mode::Off
+            }
+            _ => {
+                unreachable!()
+            }
+        };
+    }
+}
+impl Dispatch<ZwlrOutputPowerManagerV1, ()> for OutputState {
+    fn event(
+        _: &mut Self,
+        _: &ZwlrOutputPowerManagerV1,
+        _: zwlr_output_power_manager_v1::Event,
+        _: &(),
+        _: &Connection,
+        _: &QueueHandle<OutputState>,
+    ) {
+    }
+}
+
+//delegate_noop!(OutputState: ignore ZwlrOutputPowerManagerV1);
 delegate_noop!(PowerManagerState: ignore ZwlrOutputPowerManagerV1);
 delegate_noop!(PowerManagerState: ignore ZwlrOutputPowerV1);
 delegate_noop!(PowerManagerState: ignore WlRegistry);
