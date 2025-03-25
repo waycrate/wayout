@@ -1,5 +1,5 @@
 [package]
-authors = ["Shinyzenith <https://shinyzenith.xyz>"]
+authors = ["Shinyzenith <https://aakash.is-a.dev>"]
 description = "A Simple tool to set output modes for wlroots compositors implementing zwlr_output_power_management_v1."
 documentation = "https://docs.rs/crate/wayout/latest"
 edition = "2021"
@@ -13,13 +13,14 @@ homepage = "https://waycrate.shinyzenith.xyz"
 keywords = ["display", "power", "wlroots"]
 license = "BSD-2-Clause"
 name = "wayout"
-repository = "https://git.sr.ht/~shinyzenith/wayout"
+repository = "https://github.com/shinyzenith/wayout"
 version = "1.1.3"
 
 [dependencies]
-clap = "3.1.2"
-wayland-client = "0.29.4"
-wayland-protocols = { version = "0.29.4", features=["unstable_protocols", "client"] }
+clap = { version = "4.5.31", features=["derive"] }
+wayland-client = "0.31.8"
+wayland-protocols = { version = "0.32.6", features=["unstable", "client"] }
+wayland-protocols-wlr = { version = "0.3.6", features = ["client"] }
 
 [[bin]]
 name = "wayout"
