@@ -79,7 +79,7 @@ impl WayoutConnection {
         {
             Ok(x) => x,
             Err(e) => {
-                panic!("Failed to bind to required wayaland global: {}", e);
+                panic!("Failed to bind to required wayland global: {}", e);
             }
         };
 
@@ -93,7 +93,7 @@ impl WayoutConnection {
         event_queue.roundtrip(&mut state).unwrap();
     }
 
-    pub fn get_output_state(self: &Self) -> Vec<OutputState> {
+    pub fn get_output_states(self: &Self) -> Vec<OutputState> {
         let mut event_queue = self.wl_connection.new_event_queue::<OutputState>();
         let qh = event_queue.handle();
 
@@ -115,8 +115,8 @@ impl WayoutConnection {
             };
             zwlr_output_power_manager.get_output_power(&output.wl_output, &qh, ());
 
-            states.push(state.clone());
             event_queue.blocking_dispatch(&mut state).unwrap();
+            states.push(state.clone());
         }
 
         //event_queue.roundtrip(&mut state).unwrap();
