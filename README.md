@@ -1,10 +1,10 @@
 <p align=center>
-  <img src="https://git.sr.ht/~shinyzenith/wayout/blob/main/docs/assets/wayout.png" alt=wayout width=60%>
+  <img src="https://github.com/waycrate/wayout/blob/main/docs/assets/wayout.png" alt=wayout width=60%>
   <p align=center>A simple output management tool for wlroots based compositors implementing zwlr_output_power_management_v1</p>
   
   <p align="center">
   <a href="./LICENSE.md"><img src="https://img.shields.io/github/license/waycrate/wayout?style=flat-square&logo=appveyor"></a>
-  <img src="https://img.shields.io/badge/cargo-v1.1.0-green?style=flat-square&logo=appveyor">
+  <img src="https://img.shields.io/badge/cargo-v1.2.3-green?style=flat-square&logo=appveyor">
   <img src="https://img.shields.io/github/issues/waycrate/wayout?style=flat-square&logo=appveyor">
   <img src="https://img.shields.io/github/forks/waycrate/wayout?style=flat-square&logo=appveyor">
   <img src="https://img.shields.io/github/stars/waycrate/wayout?style=flat-square&logo=appveyor">
