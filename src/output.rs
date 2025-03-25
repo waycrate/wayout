@@ -1,12 +1,11 @@
 use std::fmt::Display;
-use std::process::exit;
 use wayland_client::Dispatch;
 use wayland_client::{
+    Connection, QueueHandle,
     protocol::{
         wl_output::{self, WlOutput},
         wl_registry::{self, WlRegistry},
     },
-    Connection, QueueHandle,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -46,15 +45,13 @@ impl Dispatch<WlRegistry, ()> for OutputCaptureState {
             version,
         } = event
         {
-            if interface == "wl_output" {
-                if version >= 4 {
-                    let output = wl_registry.bind::<wl_output::WlOutput, _, _>(name, 4, qh, ());
-                    state.outputs.push(OutputInfo {
-                        wl_output: output,
-                        name: String::new(),
-                        description: String::new(),
-                    });
-                }
+            if interface == "wl_output" && version >= 4 {
+                let output = wl_registry.bind::<wl_output::WlOutput, _, _>(name, 4, qh, ());
+                state.outputs.push(OutputInfo {
+                    wl_output: output,
+                    name: String::new(),
+                    description: String::new(),
+                });
             }
         }
     }
@@ -98,20 +95,10 @@ pub fn get_all_wl_outputs(wl_connection: &Connection) -> Vec<OutputInfo> {
 
     event_queue.roundtrip(&mut state).unwrap(); // This one gets all wl_outputs
     event_queue.roundtrip(&mut state).unwrap(); // This one gets all the events of ALL the
-                                                // wl_outputs
+    // wl_outputs
 
     if state.outputs.is_empty() {
         println!("Compositor didn't advertise any valid wl_outputs");
     }
-    return state.outputs;
-}
-
-pub fn get_wloutput(name: String, outputs: Vec<OutputInfo>) -> WlOutput {
-    for output in outputs {
-        if output.name == name {
-            return output.wl_output;
-        }
-    }
-    println!("Error: No output of name \"{}\" was found", name);
-    exit(1);
+    state.outputs
 }

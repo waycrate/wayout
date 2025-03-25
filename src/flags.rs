@@ -7,7 +7,7 @@ use clap::Parser;
     author = env!("CARGO_PKG_AUTHORS"),
     about = "Simple tool to set output mode of Heads for wlroots based compositors."
 )]
-pub struct CLI {
+pub struct Cli {
     #[arg(long, value_name = "OUTPUT")]
     pub on: Option<String>,
 
@@ -18,6 +18,6 @@ pub struct CLI {
     pub toggle: Option<String>,
 }
 
-pub fn parse_flags() -> CLI {
-    return CLI::parse();
+pub fn parse_flags() -> Cli {
+    Cli::parse()
 }

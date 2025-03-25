@@ -16,10 +16,8 @@ pub fn main() {
     let args = flags::parse_flags();
     let mut output_name = String::new();
 
-    for arg in [&args.on, &args.off, &args.toggle] {
-        if let Some(output) = arg {
-            output_name = output.trim().to_string();
-        }
+    for arg in [&args.on, &args.off, &args.toggle].into_iter().flatten() {
+        output_name = arg.trim().to_string();
     }
 
     if args.on.is_some() {
@@ -54,7 +52,7 @@ pub fn main() {
 pub fn set_head_state(output_name: String, mode: Mode) {
     let mut wayout_conn = WayoutConnection::init();
     wayout_conn.refresh_outputs();
-    
+
     if let Some(output) = wayout_conn.get_wloutput(output_name) {
         wayout_conn.set_output_state(output, mode);
     }
@@ -63,9 +61,9 @@ pub fn set_head_state(output_name: String, mode: Mode) {
 pub fn get_head_states() -> Vec<HeadState> {
     let mut wayout_conn = WayoutConnection::init();
     wayout_conn.refresh_outputs();
-    
+
     let output_states = wayout_conn.get_output_states();
-    
+
     output_states
         .into_iter()
         .map(|state| HeadState {

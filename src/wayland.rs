@@ -1,12 +1,11 @@
-use crate::output::{get_all_wl_outputs, OutputInfo};
+use crate::output::{OutputInfo, get_all_wl_outputs};
 use wayland_client::{
-    delegate_noop,
-    globals::{registry_queue_init, GlobalList, GlobalListContents},
+    Connection, Dispatch, QueueHandle, delegate_noop,
+    globals::{GlobalList, GlobalListContents, registry_queue_init},
     protocol::{
         wl_output::WlOutput,
         wl_registry::{self, WlRegistry},
     },
-    Connection, Dispatch, QueueHandle,
 };
 use wayland_protocols_wlr::output_power_management::v1::client::{
     zwlr_output_power_manager_v1::{self, ZwlrOutputPowerManagerV1},
@@ -44,22 +43,20 @@ impl WayoutConnection {
         let wl_connection = connection.unwrap();
         let (wl_globals, event_queue) =
             registry_queue_init::<WayoutConnection>(&wl_connection).unwrap();
-        let queue_handle = event_queue.handle();
+        let _queue_handle = event_queue.handle();
 
-        let wayout_state = WayoutConnection {
+        WayoutConnection {
             wl_connection,
             wl_globals,
             wl_outputs: vec![],
-        };
-
-        return wayout_state;
+        }
     }
 
-    pub fn refresh_outputs(self: &mut Self) {
+    pub fn refresh_outputs(&mut self) {
         self.wl_outputs = get_all_wl_outputs(&self.wl_connection);
     }
 
-    pub fn get_wloutput(self: &mut Self, name: String) -> Option<WlOutput> {
+    pub fn get_wloutput(&mut self, name: String) -> Option<WlOutput> {
         for output in self.wl_outputs.clone() {
             if output.name == name {
                 return Some(output.wl_output);
@@ -69,7 +66,7 @@ impl WayoutConnection {
         None
     }
 
-    pub fn set_output_state(self: &Self, output: WlOutput, mode: Mode) {
+    pub fn set_output_state(&self, output: WlOutput, mode: Mode) {
         let mut event_queue = self.wl_connection.new_event_queue::<PowerManagerState>();
         let qh = event_queue.handle();
 
@@ -93,7 +90,7 @@ impl WayoutConnection {
         event_queue.roundtrip(&mut state).unwrap();
     }
 
-    pub fn get_output_states(self: &Self) -> Vec<OutputState> {
+    pub fn get_output_states(&self) -> Vec<OutputState> {
         let mut event_queue = self.wl_connection.new_event_queue::<OutputState>();
         let qh = event_queue.handle();
 
@@ -119,8 +116,7 @@ impl WayoutConnection {
             states.push(state.clone());
         }
 
-        //event_queue.roundtrip(&mut state).unwrap();
-        return states;
+        states
     }
 }
 
