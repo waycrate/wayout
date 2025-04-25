@@ -1,7 +1,7 @@
 <p align=center>
   <img src="https://github.com/waycrate/wayout/blob/main/docs/assets/wayout.png" alt=wayout width=60%>
   <p align=center>A simple output management tool for wlroots based compositors implementing zwlr_output_power_management_v1</p>
-  
+
   <p align="center">
   <a href="./LICENSE.md"><img src="https://img.shields.io/github/license/waycrate/wayout?style=flat-square&logo=appveyor"></a>
   <img src="https://img.shields.io/badge/cargo-v1.2.4-green?style=flat-square&logo=appveyor">
@@ -35,6 +35,12 @@ Toggle the state of a display:
 
 ```bash
 wayout --toggle <your output name>
+```
+
+Toggle the state of all display:
+
+```bash
+wayout --toggle "*"
 ```
 
 # Installation

@@ -38,7 +38,6 @@ impl Dispatch<WlRegistry, ()> for OutputCaptureState {
         /* > The name event is sent after binding the output object. This event
          * is only sent once per output object, and the name does not change
          * over the lifetime of the wl_output global. */
-
         if let wl_registry::Event::Global {
             name,
             interface,
